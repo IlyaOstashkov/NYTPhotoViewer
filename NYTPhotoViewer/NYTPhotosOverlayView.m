@@ -58,7 +58,23 @@
     [super layoutSubviews];
 
     if ([self.captionView conformsToProtocol:@protocol(NYTPhotoCaptionViewLayoutWidthHinting)]) {
-        [(id<NYTPhotoCaptionViewLayoutWidthHinting>) self.captionView setPreferredMaxLayoutWidth:self.bounds.size.width];
+        [(id<NYTPhotoCaptionViewLayoutWidthHinting>) self.captionView setPreferredMaxLayoutWidth:[self preferredMaxLayoutWidth]];
+    }
+}
+
+- (void)safeAreaInsetsDidChange {
+    [super safeAreaInsetsDidChange];
+    if ([self.captionView conformsToProtocol:@protocol(NYTPhotoCaptionViewLayoutWidthHinting)]) {
+        [(id<NYTPhotoCaptionViewLayoutWidthHinting>) self.captionView setPreferredMaxLayoutWidth:[self preferredMaxLayoutWidth]];
+    }
+}
+
+- (CGFloat)preferredMaxLayoutWidth
+{
+    if (@available(iOS 11.0, *)) {
+        return self.bounds.size.width - self.safeAreaInsets.left - self.safeAreaInsets.right;
+    } else {
+        return self.bounds.size.width;
     }
 }
 
@@ -80,7 +96,7 @@
     
     [self addSubview:self.navigationBar];
     
-    if ([self respondsToSelector:@selector(safeAreaLayoutGuide)]) {
+    if (@available(iOS 11.0, *)) {
         NSLayoutConstraint *topConstraint = [self.navigationBar.topAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.topAnchor];
         NSLayoutConstraint *leftConstraint = [self.navigationBar.leftAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.leftAnchor];
         NSLayoutConstraint *rightConstraint = [self.navigationBar.rightAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.rightAnchor];
@@ -105,7 +121,7 @@
     self.captionView.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:self.captionView];
 
-    if ([self respondsToSelector:@selector(safeAreaLayoutGuide)] && self.captionViewRespectsSafeArea) {
+    if (@available(iOS 11.0, *)) {
         NSLayoutConstraint *bottomConstraint = [self.captionView.bottomAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.bottomAnchor];
         NSLayoutConstraint *leftConstraint = [self.captionView.leftAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.leftAnchor];
         NSLayoutConstraint *rightConstraint = [self.captionView.rightAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.rightAnchor];
